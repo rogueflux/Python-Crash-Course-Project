@@ -1,0 +1,40 @@
+def get_event_date(event):
+    return event.date
+
+def current_users(events):
+    events.sort(key=get_event_date)
+    machines = {}
+    for event in events:
+        if event.machine not in machines:
+            machines[event.machine] = {}
+        if event.type == "login":
+            machines[event.machine][event.user] = True
+        elif event.type == "logout":
+            # Remove user from the dictionary if present
+            machines[event.machine].pop(event.user, None)
+    return machines
+
+def generate_report(machines):
+    for machine, users in machines.items():
+        if users:  # If there are any users logged in
+            user_list = ", ".join(users.keys())
+            print(f"{machine}: {user_list}")
+
+class Event:
+    def __init__(self, event_date, event_type, machine_name, user):
+        self.date = event_date
+        self.type = event_type
+        self.machine = machine_name
+        self.user = user
+
+# Example events
+events = [
+    Event('2025-05-19 10:00', 'login', 'workstation.local', 'jordan'),
+    Event('2025-05-19 10:05', 'login', 'mailserver.local', 'chris'),
+    Event('2025-05-19 10:06', 'logout', 'workstation.local', 'jordan'),
+    Event('2025-05-19 10:07', 'login', 'mailserver.local', 'taylor'),
+    Event('2025-05-19 10:08', 'logout', 'mailserver.local', 'chris'),
+]
+
+users = current_users(events)
+generate_report(users)
